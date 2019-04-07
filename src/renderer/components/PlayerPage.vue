@@ -1,10 +1,18 @@
 <template>
   <div id="wrapper">
-    {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
-    {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/>
-    <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime($event)" @ended="stop()"></audio>
-    <button @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
-    <button class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button>
+    <button @click="showOpenFileDialog()">Load Music</button>
+    <p>&nbsp;</p>
+    <div v-if="isFileSelect">
+      {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
+      {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
+      <button @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
+      <button class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button>      
+    </div>
+    <div v-else>
+      Press 'Load Music' button to select an audio file.
+    </div>
+    <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
+    <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
   </div>
 </template>
 
@@ -14,9 +22,11 @@
     data () {
       return {
         tagLib: require('music-metadata'),
+        isFileSelect: false,
         isPlaying: false,
         audio: null,
-        url: 'file:///Users/unciax/Desktop/bgm162.mp3',
+        file: null,
+        url: null,
         currentMusicTitle: null,
         currentMusicArtist: null,
         currentMusicDuration: null,
@@ -25,6 +35,7 @@
     },
     mounted () {
       this.audio = this.$refs.audio
+      this.file = this.$refs.file
     },
     methods: {
       control () {
@@ -52,14 +63,19 @@
         this.currentMusicDuration = this.audio.duration
         this.currentMusicTime = this.audio.currentTime
       },
-      updateCurrentTime ($event) {
+      updateCurrentTime () {
         this.currentMusicTime = this.audio.currentTime
       },
-      changeToDisplayTimeString (value) {
-        let sec = value % 60
-        let min = (value - sec) / 60
-        sec = Math.round(sec)
-        return min + ':' + sec
+      showOpenFileDialog () {
+        this.file.click()
+      },
+      loadFile () {
+        if (this.file.files.length === 0) {
+          this.isFileSelect = false
+          return
+        }
+        this.url = 'file://' + this.file.files[0].path
+        this.isFileSelect = true
       }
     },
     filters: {
