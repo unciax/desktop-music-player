@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <landing-page></landing-page>
+    <player-page></player-page>
   </div>
 </template>
 
 <script>
-  import LandingPage from '@/components/LandingPage'
+  import PlayerPage from '@/components/PlayerPage'
 
   export default {
     name: 'desktop-music-player',
     components: {
-      LandingPage
+      PlayerPage
     }
   }
 </script>
