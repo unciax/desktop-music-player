@@ -1,5 +1,6 @@
 <template>
   <div id="wrapper">
+    {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
     <button @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
     <button class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button>
   </div>
@@ -10,9 +11,24 @@
     name: 'player-page',
     data () {
       return {
+        tagLib: require('music-metadata'),
         isPlaying: false,
-        audio: new Audio('file:///Users/unciax/Desktop/bgm162.mp3')
+        audio: null,
+        currentMusicTitle: null,
+        currentMusicArtist: null
       }
+    },
+    mounted () {
+      let url = 'file:///Users/unciax/Desktop/01.mp3'
+      this.audio = new Audio(url)
+      this.tagLib.parseFile(url.replace('file:/', ''))
+        .then(metadata => {
+          this.currentMusicTitle = metadata.common.title
+          this.currentMusicArtist = metadata.common.artist
+        })
+        .catch(err => {
+          console.error(err.message)
+        })
     },
     methods: {
       control () {
