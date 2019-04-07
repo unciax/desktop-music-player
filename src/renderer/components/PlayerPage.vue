@@ -1,6 +1,8 @@
 <template>
   <div id="wrapper">
     {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
+    {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/>
+    <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime($event)" @ended="stop()"></audio>
     <button @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
     <button class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button>
   </div>
@@ -14,21 +16,15 @@
         tagLib: require('music-metadata'),
         isPlaying: false,
         audio: null,
+        url: 'file:///Users/unciax/Desktop/bgm162.mp3',
         currentMusicTitle: null,
-        currentMusicArtist: null
+        currentMusicArtist: null,
+        currentMusicDuration: null,
+        currentMusicTime: null
       }
     },
     mounted () {
-      let url = 'file:///Users/unciax/Desktop/01.mp3'
-      this.audio = new Audio(url)
-      this.tagLib.parseFile(url.replace('file:/', ''))
-        .then(metadata => {
-          this.currentMusicTitle = metadata.common.title
-          this.currentMusicArtist = metadata.common.artist
-        })
-        .catch(err => {
-          console.error(err.message)
-        })
+      this.audio = this.$refs.audio
     },
     methods: {
       control () {
@@ -43,6 +39,40 @@
         this.isPlaying = false
         this.audio.pause()
         this.audio.currentTime = 0
+      },
+      updateMusicInfomation () {
+        this.tagLib.parseFile(this.audio.src.replace('file:/', ''))
+          .then(metadata => {
+            this.currentMusicTitle = metadata.common.title ? metadata.common.title : 'No Title'
+            this.currentMusicArtist = metadata.common.artist ? metadata.common.artist : 'No Artist'
+          })
+          .catch(err => {
+            console.error(err.message)
+          })
+        this.currentMusicDuration = this.audio.duration
+        this.currentMusicTime = this.audio.currentTime
+      },
+      updateCurrentTime ($event) {
+        this.currentMusicTime = this.audio.currentTime
+      },
+      changeToDisplayTimeString (value) {
+        let sec = value % 60
+        let min = (value - sec) / 60
+        sec = Math.round(sec)
+        return min + ':' + sec
+      }
+    },
+    filters: {
+      timeString: function (value) {
+        if (!value) return '00:00'
+        let sec = value % 60
+        let min = value > 60 ? (value - sec) / 60 : 0
+        let hour = min > 60 ? (min - (min % 60)) / 60 : 0
+        sec = Math.round(sec)
+        let displayString = sec < 10 ? '0' + sec : sec
+        displayString = (min < 10 ? '0' + min : min) + ':' + displayString
+        displayString = (hour > 0 ? (hour < 10 ? '0' + hour : hour) + ':' : '') + displayString
+        return displayString
       }
     }
   }
