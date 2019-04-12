@@ -52,7 +52,7 @@
         this.audio.currentTime = 0
       },
       updateMusicInfomation () {
-        this.tagLib.parseFile(this.audio.src.replace('file:/', ''))
+        this.tagLib.parseFile(decodeURI(this.audio.src.replace('file:/', '')))
           .then(metadata => {
             this.currentMusicTitle = metadata.common.title ? metadata.common.title : 'No Title'
             this.currentMusicArtist = metadata.common.artist ? metadata.common.artist : 'No Artist'
