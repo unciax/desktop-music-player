@@ -1,20 +1,22 @@
 <template>
-  <div id="wrapper">
-    <br/>
-    <button @click="showOpenFileDialog()">Load Music</button>
-    <button v-if="isFileSelect" @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
-    <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button> 
-    <p>&nbsp;</p>
-    <div v-if="isFileSelect">
-      <!--{{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>-->
-      {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>  
+  <div ref="playerbackground" id="player_background">
+    <div id="wrapper">
+      <br/>
+      <button @click="showOpenFileDialog()">Load Music</button>
+      <button v-if="isFileSelect" @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
+      <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button> 
+      <p>&nbsp;</p>
+      <div v-if="isFileSelect">
+        {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
+        {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
+      </div>
+      <div v-else>
+        Press 'Load Music' button to select an audio file.
+      </div>
+      <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
+      <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
+      <canvas id="canvas" ref="canvas"></canvas>
     </div>
-    <div v-else>
-      Press 'Load Music' button to select an audio file.
-    </div>
-    <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
-    <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
-    <canvas id="canvas" ref="canvas"></canvas>
   </div>
 </template>
 
@@ -30,6 +32,7 @@
         file: null,
         url: null,
         canvas: null,
+        playerbackground: null,
         currentMusicTitle: null,
         currentMusicArtist: null,
         currentMusicDuration: null,
@@ -51,13 +54,16 @@
       this.audio = this.$refs.audio
       this.file = this.$refs.file
       this.canvas = this.$refs.canvas
+      this.playerbackground = this.$refs.playerbackground
       this.audioContext = new AudioContext()
       this.audioSrc = this.audioContext.createMediaElementSource(this.audio)
       this.ctx = this.canvas.getContext('2d')
       window.addEventListener('resize', this.updateCanvasSize)
     },
     beforeDestroy: function () {
-      this.audioContext.close()
+      if (this.audioContext) {
+        this.audioContext.close()
+      }
       window.removeEventListener('resize', this.updateCanvasSize)
     },
     methods: {
@@ -80,7 +86,11 @@
           .then(metadata => {
             this.currentMusicTitle = metadata.common.title ? metadata.common.title : 'No Title'
             this.currentMusicArtist = metadata.common.artist ? metadata.common.artist : 'No Artist'
-            this.reloadMusicInformation()
+            if (metadata.common.picture.length > 0) {
+              let src = 'data:image/jpeg;base64,' + metadata.common.picture[0].data.toString('base64')
+              this.playerbackground.style.background = 'url("' + src + '") no-repeat'
+              this.playerbackground.style.backgroundSize = 'cover'
+            }
           })
           .catch(err => {
             console.error(err.message)
@@ -106,7 +116,7 @@
         this.audioSrc.connect(this.audioAnalyser)
         this.audioAnalyser.connect(this.audioContext.destination)
 
-        this.audioAnalyser.fftSize = 256
+        this.audioAnalyser.fftSize = 512
 
         this.bufferLength = this.audioAnalyser.frequencyBinCount
 
@@ -124,7 +134,18 @@
 
         this.audioAnalyser.getByteFrequencyData(this.audioDataArray)
 
-        this.ctx.clearRect(0, 45, this.canvasWidth, this.canvasHeight)
+        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+
+        // this.ctx.shadowBlur = 0
+        // this.ctx.fillStyle = 'rgb(255, 255, 255)'
+
+        // this.ctx.font = '24px sans-serif'
+        // this.ctx.fillText(this.currentMusicTitle, 0, 20)
+
+        // this.ctx.font = '18px sans-serif'
+        // this.ctx.fillText(this.currentMusicArtist, 0, 45)
+
+        // this.ctx.fillText(this.timeString(this.currentMusicTime), this.canvasWidth - 80, 45)
 
         this.ctx.fillStyle = 'rgb(255, 255, 255)'
         this.ctx.shadowBlur = 20
@@ -133,29 +154,17 @@
         for (var i = 0; i < this.bufferLength; i++) {
           this.barHeight = this.audioDataArray[i] * 0.2 + 1
 
-          this.ctx.fillRect(this.x, 65, this.barWidth, this.barHeight)
+          this.ctx.fillRect(this.x, 60, this.barWidth, this.barHeight)
 
           this.x += this.barWidth + 1
         }
       },
       updateCanvasSize () {
-        this.canvas.width = window.innerWidth
+        this.canvas.width = window.innerWidth - 20
         this.canvas.height = 500
         this.canvasWidth = this.canvas.width
         this.canvasHeight = this.canvas.height
         this.barWidth = (this.canvasWidth / this.bufferLength) * 1.1
-      },
-      reloadMusicInformation () {
-        this.ctx.clearRect(0, 0, this.canvasWidth, 65)
-
-        this.ctx.shadowBlur = 0
-        this.ctx.fillStyle = 'rgb(255, 255, 255)'
-
-        this.ctx.font = '24px sans-serif'
-        this.ctx.fillText(this.currentMusicTitle, 0, 20)
-
-        this.ctx.font = '18px sans-serif'
-        this.ctx.fillText(this.currentMusicArtist, 0, 45)
       }
     },
     filters: {
@@ -186,17 +195,22 @@
   body { 
     font-family: 'Source Sans Pro', sans-serif;
     color: #fff;
-  }
-
-  #wrapper {
     background:
       radial-gradient(
         ellipse at top left,
         rgba(100, 100, 100, 1) 40%,
         rgba(80, 80, 80, .9) 100%
       );
+  }
+
+  #player_background, #wrapper {
     height: 100vh;
     width: 100vw;
+  }
+
+  #wrapper {
+    background: rgba(0, 0, 0, .5);
+    padding: 10px;
   }
 
   button {
