@@ -86,7 +86,7 @@
           .then(metadata => {
             this.currentMusicTitle = metadata.common.title ? metadata.common.title : 'No Title'
             this.currentMusicArtist = metadata.common.artist ? metadata.common.artist : 'No Artist'
-            if (metadata.common.picture.length > 0) {
+            if (metadata.common.picture) {
               let src = 'data:image/jpeg;base64,' + metadata.common.picture[0].data.toString('base64')
               this.playerbackground.style.background = 'url("' + src + '") no-repeat'
               this.playerbackground.style.backgroundSize = 'cover'
@@ -107,7 +107,8 @@
       loadFile () {
         if (this.file.files.length === 0) {
           this.isFileSelect = false
-          this.ctx.clearRect(0, 0, this.canvasWidth, 65)
+          this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+          this.playerbackground.style.background = 'none'
           return
         }
         this.url = 'file://' + this.file.files[0].path
@@ -198,8 +199,8 @@
     background:
       radial-gradient(
         ellipse at top left,
-        rgba(100, 100, 100, 1) 40%,
-        rgba(80, 80, 80, .9) 100%
+        rgba(255, 255, 255, 1) 40%,
+        rgba(229, 229, 229, .9) 100%
       );
   }
 
