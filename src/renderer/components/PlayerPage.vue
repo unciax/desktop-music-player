@@ -25,7 +25,6 @@
     name: 'player-page',
     data () {
       return {
-        tagLib: require('music-metadata'),
         isFileSelect: false,
         isPlaying: false,
         audio: null,
@@ -82,14 +81,15 @@
         this.audio.currentTime = 0
       },
       updateMusicInfomation () {
-        this.tagLib.parseFile(decodeURI(this.audio.src.replace('file:/', '')))
-          .then(metadata => {
-            this.currentMusicTitle = metadata.common.title ? metadata.common.title : 'No Title'
-            this.currentMusicArtist = metadata.common.artist ? metadata.common.artist : 'No Artist'
-            if (metadata.common.picture) {
-              let src = 'data:image/jpeg;base64,' + metadata.common.picture[0].data.toString('base64')
-              this.playerbackground.style.background = 'url("' + src + '") no-repeat'
-              this.playerbackground.style.backgroundSize = 'cover'
+        this.$getMusicInfomation(this.audio.src)
+          .then(info => {
+            this.currentMusicTitle = info.musicTitle
+            this.currentMusicArtist = info.musicArtist
+            let background = this.playerbackground.style
+            if (info.musicCover) {
+              background.backgroundImage = 'url("' + info.musicCover + '")'
+            } else {
+              background.backgroundImage = 'none'
             }
           })
           .catch(err => {
@@ -108,7 +108,7 @@
         if (this.file.files.length === 0) {
           this.isFileSelect = false
           this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-          this.playerbackground.style.background = 'none'
+          this.playerbackground.style.backgroundImage = 'none'
           return
         }
         this.url = 'file://' + this.file.files[0].path
@@ -212,6 +212,11 @@
   #wrapper {
     background: rgba(0, 0, 0, .5);
     padding: 10px;
+  }
+
+  #player_background {
+    background-size: cover;
+    background-repeat: no-repeat;
   }
 
   button {
