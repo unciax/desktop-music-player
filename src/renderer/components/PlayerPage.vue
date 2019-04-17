@@ -2,9 +2,12 @@
   <div ref="playerbackground" id="player_background">
     <div id="wrapper">
       <br/>
-      <button @click="showOpenFileDialog()">Load Music</button>
-      <button v-if="isFileSelect" @click="control()">{{ isPlaying ? 'Pause' : 'Play'}}</button>
-      <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying">Stop</button> 
+      <button @click="showOpenFileDialog()"><font-awesome-icon icon="folder-open" /></button>
+      <button v-if="isFileSelect" @click="control()">
+        <font-awesome-icon v-if="isPlaying" icon="pause" />
+        <font-awesome-icon v-if="!isPlaying" icon="play" />
+      </button>
+      <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button> 
       <p>&nbsp;</p>
       <div v-if="isFileSelect">
         {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
@@ -220,32 +223,37 @@
   }
 
   button {
-    font-size: .8em;
+    font-size: 1em;
     cursor: pointer;
     outline: none;
     padding: 0.75em 2em;
-    border-radius: 2em;
+    border: 0px;
     display: inline-block;
     color: #fff;
-    background-color: #4fc08d;
+    background-color: transparent;
     transition: all 0.15s ease;
     box-sizing: border-box;
-    border: 1px solid #4fc08d;
   }
 
-  button.alt {
-    color: #42b983;
-    background-color: transparent;
+  button:hover {
+    background: rgba(0, 0, 0, .1);
+  }
+
+  button:hover .svg-inline--fa {
+    -webkit-filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
+    filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
   }
 
   button:disabled {
-    background-color: #999;
-    border: 1px solid #999;
+    color: #999;
   }
 
-  button.alt:disabled {
-    color: #999;
-    background-color: transparent;
-    cursor: initial;
+  button:disabled:hover {
+    background: transparent;
+  }
+
+  button:disabled .svg-inline--fa {
+    -webkit-filter: none;
+    filter: none;
   }
 </style>
