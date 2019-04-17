@@ -228,6 +228,7 @@
     outline: none;
     padding: 0.75em 2em;
     border: 0px;
+    border-radius: 0.5em;
     display: inline-block;
     color: #fff;
     background-color: transparent;
