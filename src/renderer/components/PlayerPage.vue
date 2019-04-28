@@ -18,14 +18,21 @@
       </div>
       <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
       <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
-      <canvas id="canvas" ref="canvas"></canvas>
+      <div style="width:100%; height: 300px;">
+        <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+  import MusicVisualizer from '@/components/MusicVisualizer'
+
   export default {
     name: 'player-page',
+    components: {
+      MusicVisualizer
+    },
     data () {
       return {
         isFileSelect: false,
@@ -33,40 +40,22 @@
         audio: null,
         file: null,
         url: null,
-        canvas: null,
         playerbackground: null,
         currentMusicTitle: null,
         currentMusicArtist: null,
         currentMusicDuration: null,
-        currentMusicTime: null,
-        audioContext: null,
-        audioSrc: null,
-        audioAnalyser: null,
-        ctx: null,
-        bufferLength: null,
-        canvasHeight: 0,
-        canvasWidth: 0,
-        audioDataArray: null,
-        barWidth: 0,
-        barHeight: 0,
-        x: 0
+        currentMusicTime: null
       }
     },
     mounted () {
       this.audio = this.$refs.audio
       this.file = this.$refs.file
-      this.canvas = this.$refs.canvas
       this.playerbackground = this.$refs.playerbackground
-      this.audioContext = new AudioContext()
-      this.audioSrc = this.audioContext.createMediaElementSource(this.audio)
-      this.ctx = this.canvas.getContext('2d')
-      window.addEventListener('resize', this.updateCanvasSize)
     },
     beforeDestroy: function () {
       if (this.audioContext) {
         this.audioContext.close()
       }
-      window.removeEventListener('resize', this.updateCanvasSize)
     },
     methods: {
       control () {
@@ -74,7 +63,6 @@
           this.audio.pause()
         } else {
           this.audio.play()
-          this.renderFrame()
         }
         this.isPlaying = !this.isPlaying
       },
@@ -110,65 +98,11 @@
       loadFile () {
         if (this.file.files.length === 0) {
           this.isFileSelect = false
-          this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
           this.playerbackground.style.backgroundImage = 'none'
           return
         }
         this.url = 'file://' + this.file.files[0].path
         this.isFileSelect = true
-        this.audioAnalyser = this.audioContext.createAnalyser()
-        this.audioSrc.connect(this.audioAnalyser)
-        this.audioAnalyser.connect(this.audioContext.destination)
-
-        this.audioAnalyser.fftSize = 512
-
-        this.bufferLength = this.audioAnalyser.frequencyBinCount
-
-        this.audioDataArray = new Uint8Array(this.bufferLength)
-
-        this.updateCanvasSize()
-        this.renderFrame()
-
-        this.x = 0
-      },
-      renderFrame () {
-        requestAnimationFrame(this.renderFrame)
-
-        this.x = 0
-
-        this.audioAnalyser.getByteFrequencyData(this.audioDataArray)
-
-        this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-
-        // this.ctx.shadowBlur = 0
-        // this.ctx.fillStyle = 'rgb(255, 255, 255)'
-
-        // this.ctx.font = '24px sans-serif'
-        // this.ctx.fillText(this.currentMusicTitle, 0, 20)
-
-        // this.ctx.font = '18px sans-serif'
-        // this.ctx.fillText(this.currentMusicArtist, 0, 45)
-
-        // this.ctx.fillText(this.timeString(this.currentMusicTime), this.canvasWidth - 80, 45)
-
-        this.ctx.fillStyle = 'rgb(255, 255, 255)'
-        this.ctx.shadowBlur = 20
-        this.ctx.shadowColor = 'rgb(255, 255, 255)'
-
-        for (var i = 0; i < this.bufferLength; i++) {
-          this.barHeight = this.audioDataArray[i] * 0.2 + 1
-
-          this.ctx.fillRect(this.x, 60, this.barWidth, this.barHeight)
-
-          this.x += this.barWidth + 1
-        }
-      },
-      updateCanvasSize () {
-        this.canvas.width = window.innerWidth - 20
-        this.canvas.height = 500
-        this.canvasWidth = this.canvas.width
-        this.canvasHeight = this.canvas.height
-        this.barWidth = (this.canvasWidth / this.bufferLength) * 1.1
       }
     },
     filters: {
