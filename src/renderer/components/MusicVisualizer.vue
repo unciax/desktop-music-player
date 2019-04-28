@@ -118,7 +118,7 @@
         for (var i = 0; i < this.audioDataArray.length; i++) {
           this.barSize.height = this.audioDataArray[i] * (this.canvas.height / 768) + 1
 
-          this.ctx.fillRect(offsetX, 30, this.barSize.width, this.barSize.height)
+          this.ctx.fillRect(offsetX, 10, this.barSize.width, this.barSize.height)
 
           offsetX += (this.barSize.width + 1.5)
         }

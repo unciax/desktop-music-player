@@ -1,26 +1,27 @@
 <template>
   <div ref="playerbackground" id="player_background">
     <div id="wrapper">
-      <br/>
-      <button @click="showOpenFileDialog()"><font-awesome-icon icon="folder-open" /></button>
-      <button v-if="isFileSelect" @click="control()">
-        <font-awesome-icon v-if="isPlaying" icon="pause" />
-        <font-awesome-icon v-if="!isPlaying" icon="play" />
-      </button>
-      <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button> 
-      <p>&nbsp;</p>
-      <div v-if="isFileSelect">
-        {{ currentMusicTitle }}<br/>
-        {{ currentMusicArtist }}<br/>
-        {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
-      </div>
-      <div v-else>
-        Press 'Load Music' button to select an audio file.
-      </div>
-      <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
-      <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
-      <div style="width:100%; height: 300px;">
-        <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
+      <div class="flex-item">
+        <button @click="showOpenFileDialog()"><font-awesome-icon icon="folder-open" /></button>
+        <button v-if="isFileSelect" @click="control()">
+          <font-awesome-icon v-if="isPlaying" icon="pause" />
+          <font-awesome-icon v-if="!isPlaying" icon="play" />
+        </button>
+        <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button> 
+        <p>&nbsp;</p>
+        <div v-if="isFileSelect">
+          {{ currentMusicTitle }}<br/>
+          {{ currentMusicArtist }}<br/>
+          {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
+        </div>
+        <div v-else>
+          Press 'Load Music' button to select an audio file.
+        </div>
+        <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
+        <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
+        <div style="width: 100%; height: 250px;">
+          <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
+        </div>
       </div>
     </div>
   </div>
@@ -146,8 +147,22 @@
 
   #wrapper {
     background: rgba(0, 0, 0, .5);
-    padding: 10px;
+    padding: 0;
+    margin: 0;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+
+  .flex-item {
+    padding: 10px;
+    width: 100%;
+    max-width: 560px;
+}
 
   #player_background {
     background-size: cover;
