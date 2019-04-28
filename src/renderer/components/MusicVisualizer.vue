@@ -127,6 +127,7 @@
         this.audioAnalyser = this.audioContext.createAnalyser()
         this.audioSrc = this.audioContext.createMediaElementSource(this.audioElement)
         this.audioSrc.connect(this.audioAnalyser)
+        this.audioAnalyser.connect(this.audioContext.destination)
         this.audioAnalyser.fftSize = 512
         this.audioDataArray = new Uint8Array(this.audioAnalyser.frequencyBinCount)
         this.renderVisualization()
