@@ -10,7 +10,8 @@
       <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button> 
       <p>&nbsp;</p>
       <div v-if="isFileSelect">
-        {{ currentMusicTitle }} / {{ currentMusicArtist }} <br/>
+        {{ currentMusicTitle }}<br/>
+        {{ currentMusicArtist }}<br/>
         {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
       </div>
       <div v-else>
@@ -101,6 +102,8 @@
           this.playerbackground.style.backgroundImage = 'none'
           return
         }
+        this.currentMusicTitle = 'Loading...'
+        this.currentMusicArtist = ''
         this.url = 'file://' + this.file.files[0].path
         this.isFileSelect = true
       }
