@@ -53,11 +53,6 @@
       this.file = this.$refs.file
       this.playerbackground = this.$refs.playerbackground
     },
-    beforeDestroy: function () {
-      if (this.audioContext) {
-        this.audioContext.close()
-      }
-    },
     methods: {
       control () {
         if (this.isPlaying) {

@@ -50,6 +50,9 @@
     },
     beforeDestroy: function () {
       window.removeEventListener('resize', this.setSize)
+      if (this.audioContext) {
+        this.audioContext.close()
+      }
     },
     methods: {
       registerWindowResizeEvent () {
