@@ -12,10 +12,10 @@
         <div v-if="isFileSelect">
           {{ currentMusicTitle }}<br/>
           {{ currentMusicArtist }}<br/>
-          {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }} <br/><br/>
+          {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }}
         </div>
         <div v-else>
-          Press 'Load Music' button to select an audio file.
+          Press 'Load Music' button to select an audio file.<br/><br/>
         </div>
         <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
         <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
@@ -161,7 +161,7 @@
   .flex-item {
     padding: 10px;
     width: 100%;
-    max-width: 560px;
+    max-width: 768px;
 }
 
   #player_background {
