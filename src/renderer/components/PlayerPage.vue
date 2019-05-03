@@ -18,22 +18,25 @@
           Press 'Load Music' button to select an audio file.<br/><br/>
         </div>
         <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
-        <audio ref="audio" v-bind:src="url" @canplay="updateMusicInfomation()" @timeupdate="updateCurrentTime()" @ended="stop()"></audio>
+        <audio ref="audio" v-bind:src="url" @canplay="playAfterLoaded()" @timeupdate="updateCurrentTime()" @ended="nextMusic()"></audio>
         <div style="width: 100%; height: 250px;">
           <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
         </div>
+        <playlist v-on:currentPlayingChange="onPlayingChanged" ref="playlist"></playlist>
       </div>
-    </div>
+    </div> 
   </div>
 </template>
 
 <script>
   import MusicVisualizer from '@/components/MusicVisualizer'
+  import Playlist from '@/components/Playlist'
 
   export default {
     name: 'player-page',
     components: {
-      MusicVisualizer
+      MusicVisualizer,
+      Playlist
     },
     data () {
       return {
@@ -42,6 +45,7 @@
         audio: null,
         file: null,
         url: null,
+        list: null,
         playerbackground: null,
         currentMusicTitle: null,
         currentMusicArtist: null,
@@ -52,6 +56,7 @@
     mounted () {
       this.audio = this.$refs.audio
       this.file = this.$refs.file
+      this.list = this.$refs.playlist
       this.playerbackground = this.$refs.playerbackground
     },
     methods: {
@@ -68,23 +73,14 @@
         this.audio.pause()
         this.audio.currentTime = 0
       },
-      updateMusicInfomation () {
-        this.$getMusicInfomation(this.audio.src)
-          .then(info => {
-            this.currentMusicTitle = info.musicTitle
-            this.currentMusicArtist = info.musicArtist
-            let background = this.playerbackground.style
-            if (info.musicCover) {
-              background.backgroundImage = 'url("' + info.musicCover + '")'
-            } else {
-              background.backgroundImage = 'none'
-            }
-          })
-          .catch(err => {
-            console.error(err.message)
-          })
-        this.currentMusicDuration = this.audio.duration
-        this.currentMusicTime = this.audio.currentTime
+      updateMusicInfomation (playlistItem) {
+        this.currentMusicTitle = playlistItem.title
+        this.currentMusicArtist = playlistItem.artist
+        if (playlistItem.cover) {
+          this.playerbackground.style.backgroundImage = 'url("' + playlistItem.cover + '")'
+        } else {
+          this.playerbackground.style.backgroundImage = 'none'
+        }
       },
       updateCurrentTime () {
         this.currentMusicTime = this.audio.currentTime
@@ -94,14 +90,24 @@
       },
       loadFile () {
         if (this.file.files.length === 0) {
-          this.isFileSelect = false
-          this.playerbackground.style.backgroundImage = 'none'
           return
         }
-        this.currentMusicTitle = 'Loading...'
-        this.currentMusicArtist = ''
-        this.url = 'file://' + this.file.files[0].path
         this.isFileSelect = true
+        this.list.addMusic('file://' + this.file.files[0].path)
+      },
+      playAfterLoaded () {
+        this.currentMusicDuration = this.audio.duration
+        this.currentMusicTime = this.audio.currentTime
+        this.audio.play()
+        this.isPlaying = true
+      },
+      onPlayingChanged (playlistItem) {
+        this.url = playlistItem.url
+        this.updateMusicInfomation(playlistItem)
+      },
+      nextMusic () {
+        this.isPlaying = false
+        this.list.nextMusic()
       }
     },
     filters: {
