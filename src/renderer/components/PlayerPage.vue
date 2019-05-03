@@ -127,25 +127,6 @@
 </script>
 
 <style>
-  @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body { 
-    font-family: 'Source Sans Pro', sans-serif;
-    color: #fff;
-    background:
-      radial-gradient(
-        ellipse at top left,
-        rgba(255, 255, 255, 1) 40%,
-        rgba(229, 229, 229, .9) 100%
-      );
-  }
-
   #player_background, #wrapper {
     height: 100vh;
     width: 100vw;
@@ -168,46 +149,10 @@
     padding: 10px;
     width: 100%;
     max-width: 768px;
-}
+  }
 
   #player_background {
     background-size: cover;
     background-repeat: no-repeat;
-  }
-
-  button {
-    font-size: 1em;
-    cursor: pointer;
-    outline: none;
-    padding: 0.75em 2em;
-    border: 0px;
-    border-radius: 0.5em;
-    display: inline-block;
-    color: #fff;
-    background-color: transparent;
-    transition: all 0.15s ease;
-    box-sizing: border-box;
-  }
-
-  button:hover {
-    background: rgba(0, 0, 0, .1);
-  }
-
-  button:hover .svg-inline--fa {
-    -webkit-filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
-    filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
-  }
-
-  button:disabled {
-    color: #999;
-  }
-
-  button:disabled:hover {
-    background: transparent;
-  }
-
-  button:disabled .svg-inline--fa {
-    -webkit-filter: none;
-    filter: none;
   }
 </style>
