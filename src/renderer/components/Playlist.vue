@@ -1,9 +1,14 @@
 <template>
-  <ul>
-    <li v-for="item in list" v-bind:key="item.url">
-      {{ item.title }}
-    </li>
-  </ul>
+  <div>
+    <button @click="showFileDialog()"><font-awesome-icon icon="plus" /></button>
+    <input ref="file" type="file" name="name" style="display: none;" @change="loadMusic()"/>
+    <div class="list" v-for="(item, index) in list" v-bind:key="item.url" @click="changeToSelectedMusic(index)">
+      <p>
+        <font-awesome-icon v-if="index === currentIndex" icon="volume-up" />&nbsp;
+        {{ item.title }}
+      </p>
+    </div>  
+  </div>
 </template>
 
 <script>
@@ -15,10 +20,12 @@
       return {
         currentIndex: 0,
         _currentPlaying: null,
-        list: []
+        list: [],
+        file: null
       }
     },
     mounted () {
+      this.file = this.$refs.file
     },
     computed: {
       currentPlaying: {
@@ -32,6 +39,15 @@
       }
     },
     methods: {
+      showFileDialog () {
+        this.file.click()
+      },
+      loadMusic () {
+        if (this.file.files.length === 0) {
+          return
+        }
+        this.addMusic('file://' + this.file.files[0].path)
+      },
       addMusic (url) {
         this.$getMusicInfomation(url)
           .then(info => {
@@ -66,7 +82,11 @@
         if (this.list.length === 0) {
           return
         }
-        this.currentIndex = (this.currentIndex - 1 <= 0) ? this.list.length - 1 : this.currentIndex - 1
+        this.currentIndex = (this.currentIndex - 1 < 0) ? this.list.length - 1 : this.currentIndex - 1
+        this.currentPlaying = this.list[this.currentIndex]
+      },
+      changeToSelectedMusic (index) {
+        this.currentIndex = index
         this.currentPlaying = this.list[this.currentIndex]
       }
     },
@@ -76,4 +96,16 @@
 </script>
 
 <style>
+  div.list {
+    color: #fff;
+    padding: 10px 30px;
+    border-radius: 0.5em;
+  }
+  div.list:hover {
+    background: rgba(0, 0, 0, .1);
+    cursor: pointer;
+  }
+  div.list svg {
+    margin-left: -15px;
+  }
 </style>

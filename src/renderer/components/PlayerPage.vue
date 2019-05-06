@@ -2,12 +2,13 @@
   <div ref="playerbackground" id="player_background">
     <div id="wrapper">
       <div class="flex-item">
-        <button @click="showOpenFileDialog()"><font-awesome-icon icon="folder-open" /></button>
+        <button v-if="isFileSelect" class="alt" @click="previousMusic()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="step-backward" /></button>
         <button v-if="isFileSelect" @click="control()">
           <font-awesome-icon v-if="isPlaying" icon="pause" />
           <font-awesome-icon v-if="!isPlaying" icon="play" />
         </button>
-        <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button> 
+        <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button>
+        <button v-if="isFileSelect" class="alt" @click="nextMusic()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="step-forward" /></button>
         <p>&nbsp;</p>
         <div v-if="isFileSelect">
           {{ currentMusicTitle }}<br/>
@@ -17,7 +18,6 @@
         <div v-else>
           Press 'Load Music' button to select an audio file.<br/><br/>
         </div>
-        <input ref="file" type="file" name="name" style="display: none;" @change="loadFile()"/>
         <audio ref="audio" v-bind:src="url" @canplay="playAfterLoaded()" @timeupdate="updateCurrentTime()" @ended="nextMusic()"></audio>
         <div style="width: 100%; height: 250px;">
           <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
@@ -43,7 +43,6 @@
         isFileSelect: false,
         isPlaying: false,
         audio: null,
-        file: null,
         url: null,
         list: null,
         playerbackground: null,
@@ -55,7 +54,6 @@
     },
     mounted () {
       this.audio = this.$refs.audio
-      this.file = this.$refs.file
       this.list = this.$refs.playlist
       this.playerbackground = this.$refs.playerbackground
     },
@@ -85,16 +83,6 @@
       updateCurrentTime () {
         this.currentMusicTime = this.audio.currentTime
       },
-      showOpenFileDialog () {
-        this.file.click()
-      },
-      loadFile () {
-        if (this.file.files.length === 0) {
-          return
-        }
-        this.isFileSelect = true
-        this.list.addMusic('file://' + this.file.files[0].path)
-      },
       playAfterLoaded () {
         this.currentMusicDuration = this.audio.duration
         this.currentMusicTime = this.audio.currentTime
@@ -102,12 +90,15 @@
         this.isPlaying = true
       },
       onPlayingChanged (playlistItem) {
+        this.isFileSelect = true
         this.url = playlistItem.url
         this.updateMusicInfomation(playlistItem)
       },
       nextMusic () {
-        this.isPlaying = false
         this.list.nextMusic()
+      },
+      previousMusic () {
+        this.list.previousMusic()
       }
     },
     filters: {
