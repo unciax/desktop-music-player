@@ -1,13 +1,25 @@
 <template>
   <div>
-    <button @click="showFileDialog()"><font-awesome-icon icon="plus" /></button>
+    <div class="row">
+      <div class="col-9">
+        <button @click="showFileDialog()"><font-awesome-icon icon="plus" /></button>
+      </div>
+      <div class="col-3" style="text-align:right;">
+        <button @click="hidePlaylist()"><font-awesome-icon icon="times" /></button>
+      </div>
+    </div>
     <input ref="file" type="file" name="name" style="display: none;" @change="loadMusic()"/>
-    <div class="list" v-for="(item, index) in list" v-bind:key="item.url" @click="changeToSelectedMusic(index)">
-      <p>
-        <font-awesome-icon v-if="index === currentIndex" icon="volume-up" />&nbsp;
-        {{ item.title }}
-      </p>
-    </div>  
+    <div class="row">
+      <div class="col list-container" style="height: 330px;">
+        <div class="list" v-for="(item, index) in list" v-bind:key="item.url" @click="changeToSelectedMusic(index)">
+          <p>
+            <font-awesome-icon v-if="index === currentIndex" icon="volume-up" />&nbsp;
+            {{ item.title }}
+          </p>
+        </div> 
+      </div>
+    </div>
+     
   </div>
 </template>
 
@@ -88,6 +100,9 @@
       changeToSelectedMusic (index) {
         this.currentIndex = index
         this.currentPlaying = this.list[this.currentIndex]
+      },
+      hidePlaylist () {
+        this.$emit('triggerHide')
       }
     },
     watch: {
@@ -96,6 +111,11 @@
 </script>
 
 <style>
+  .list-container {
+    height: 100%;
+    max-height: 400px;
+    overflow-y: scroll;
+  }
   div.list {
     color: #fff;
     padding: 10px 30px;

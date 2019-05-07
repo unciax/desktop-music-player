@@ -2,27 +2,40 @@
   <div ref="playerbackground" id="player_background">
     <div id="wrapper">
       <div class="flex-item">
-        <button v-if="isFileSelect" class="alt" @click="previousMusic()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="step-backward" /></button>
-        <button v-if="isFileSelect" @click="control()">
+        <div v-show="!isShowPlaylist">
+          <div class="row">
+            <div class="col-9">
+              <button class="alt" @click="previousMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-backward" /></button>
+              <button @click="control()" v-bind:disabled="!isFileSelect">
           <font-awesome-icon v-if="isPlaying" icon="pause" />
           <font-awesome-icon v-if="!isPlaying" icon="play" />
         </button>
-        <button v-if="isFileSelect" class="alt" @click="stop()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="stop" /></button>
-        <button v-if="isFileSelect" class="alt" @click="nextMusic()" v-bind:disabled="!isPlaying"><font-awesome-icon icon="step-forward" /></button>
+              <button @click="stop()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="stop" /></button>
+              <button @click="nextMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-forward" /></button>
+              &nbsp;
+            </div>
+            <div class="col-3" style="text-align:right;">
+              <button @click="showPlaylist()"><font-awesome-icon icon="list-ol" /></button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
         <p>&nbsp;</p>
-        <div v-if="isFileSelect">
+              <p>
           {{ currentMusicTitle }}<br/>
           {{ currentMusicArtist }}<br/>
           {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }}
+              </p>
         </div>
-        <div v-else>
-          Press 'Load Music' button to select an audio file.<br/><br/>
         </div>
-        <audio ref="audio" v-bind:src="url" @canplay="playAfterLoaded()" @timeupdate="updateCurrentTime()" @ended="nextMusic()"></audio>
         <div style="width: 100%; height: 250px;">
           <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
         </div>
-        <playlist v-on:currentPlayingChange="onPlayingChanged" ref="playlist"></playlist>
+        </div>
+        <div v-show="isShowPlaylist">
+          <playlist v-on:currentPlayingChange="onPlayingChanged" v-on:triggerHide="hidePlaylist" ref="playlist"></playlist>
+        </div>
+        <audio ref="audio" v-bind:src="url" @canplay="playAfterLoaded()" @timeupdate="updateCurrentTime()" @ended="nextMusic()"></audio>
       </div>
     </div> 
   </div>
@@ -49,7 +62,8 @@
         currentMusicTitle: null,
         currentMusicArtist: null,
         currentMusicDuration: null,
-        currentMusicTime: null
+        currentMusicTime: null,
+        isShowPlaylist: true
       }
     },
     mounted () {
@@ -99,6 +113,12 @@
       },
       previousMusic () {
         this.list.previousMusic()
+      },
+      showPlaylist () {
+        this.isShowPlaylist = true
+      },
+      hidePlaylist () {
+        this.isShowPlaylist = false
       }
     },
     filters: {
