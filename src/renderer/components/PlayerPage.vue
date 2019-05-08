@@ -7,9 +7,9 @@
             <div class="col-9">
               <button class="alt" @click="previousMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-backward" /></button>
               <button @click="control()" v-bind:disabled="!isFileSelect">
-          <font-awesome-icon v-if="isPlaying" icon="pause" />
-          <font-awesome-icon v-if="!isPlaying" icon="play" />
-        </button>
+                <font-awesome-icon v-if="isPlaying" icon="pause" />
+                <font-awesome-icon v-if="!isPlaying" icon="play" />
+              </button>
               <button @click="stop()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="stop" /></button>
               <button @click="nextMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-forward" /></button>
               &nbsp;
@@ -20,17 +20,17 @@
           </div>
           <div class="row">
             <div class="col">
-        <p>&nbsp;</p>
+              <p>&nbsp;</p>
               <p>
-          {{ currentMusicTitle }}<br/>
-          {{ currentMusicArtist }}<br/>
-          {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }}
+                {{ currentMusicTitle }}<br/>
+                {{ currentMusicArtist }}<br/>
+                {{ currentMusicTime | timeString }} / {{ currentMusicDuration | timeString }}
               </p>
-        </div>
-        </div>
-        <div style="width: 100%; height: 250px;">
-          <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
-        </div>
+            </div>
+          </div>
+          <div style="width: 100%; height: 250px;">
+            <music-visualizer v-bind:audioElement="audio" responsive></music-visualizer>
+          </div>
         </div>
         <div v-show="isShowPlaylist">
           <playlist v-on:currentPlayingChange="onPlayingChanged" v-on:triggerHide="hidePlaylist" ref="playlist"></playlist>
@@ -63,13 +63,14 @@
         currentMusicArtist: null,
         currentMusicDuration: null,
         currentMusicTime: null,
-        isShowPlaylist: true
+        isShowPlaylist: false
       }
     },
     mounted () {
       this.audio = this.$refs.audio
       this.list = this.$refs.playlist
       this.playerbackground = this.$refs.playerbackground
+      this.isShowPlaylist = true
     },
     methods: {
       control () {
