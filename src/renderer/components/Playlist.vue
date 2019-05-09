@@ -8,7 +8,7 @@
         <button @click="hidePlaylist()"><icon name="close"></icon></button>
       </div>
     </div>
-    <input ref="file" type="file" name="name" style="display: none;" @change="loadMusic()"/>
+    <input ref="file" type="file" name="name" style="display: none;" multiple accept="audio/*" @change="loadMusic()"/>
     <div class="row">
       <div class="col list-container" style="height: 330px;">
         <div class="list-disable text-center" v-show="list.length == 0">
@@ -63,7 +63,9 @@
         if (this.file.files.length === 0) {
           return
         }
-        this.addMusic('file://' + this.file.files[0].path)
+        for (var index = 0; index < this.file.files.length; index++) {
+          this.addMusic('file://' + this.file.files[index].path)
+        }
       },
       addMusic (url) {
         this.$getMusicInfomation(url)
