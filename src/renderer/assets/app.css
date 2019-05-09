@@ -38,7 +38,7 @@ button:hover {
   background: rgba(0, 0, 0, .1);
 }
 
-button:hover .svg-inline--fa {
+button:hover .material-design-icon {
   -webkit-filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
   filter: drop-shadow( 0px 0px 4px rgba(255, 255, 255, .7));
 }
@@ -51,9 +51,16 @@ button:disabled:hover {
   background: transparent;
 }
 
-button:disabled .svg-inline--fa {
+button:disabled .material-design-icon {
   -webkit-filter: none;
   filter: none;
+}
+
+/* Material Design Icon */
+.material-design-icon {
+  width: auto;
+  height: 1.5em;
+  vertical-align: sub;
 }
 
 /* Text Align */

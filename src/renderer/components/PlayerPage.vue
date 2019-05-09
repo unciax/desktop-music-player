@@ -5,17 +5,17 @@
         <div v-show="!isShowPlaylist">
           <div class="row">
             <div class="col-9">
-              <button class="alt" @click="previousMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-backward" /></button>
+              <button class="alt" @click="previousMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><icon name="skip_previous"></icon></button>
               <button @click="control()" v-bind:disabled="!isFileSelect">
-                <font-awesome-icon v-if="isPlaying" icon="pause" />
-                <font-awesome-icon v-if="!isPlaying" icon="play" />
+                 <icon v-if="isPlaying" name="pause"></icon>
+                 <icon v-if="!isPlaying" name="play_arrow"></icon>
               </button>
-              <button @click="stop()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="stop" /></button>
-              <button @click="nextMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><font-awesome-icon icon="step-forward" /></button>
+              <button @click="stop()" v-bind:disabled="!isFileSelect && !isPlaying"><icon name="stop"></icon></button>
+              <button @click="nextMusic()" v-bind:disabled="!isFileSelect && !isPlaying"><icon name="skip_next"></icon></button>
               &nbsp;
             </div>
             <div class="col-3" style="text-align:right;">
-              <button @click="showPlaylist()"><font-awesome-icon icon="list-ol" /></button>
+              <button @click="showPlaylist()"><icon name="playlist_play"></icon></button>
             </div>
           </div>
           <div class="row">
@@ -68,6 +68,7 @@
     },
     mounted () {
       this.audio = this.$refs.audio
+      this.audio.volume = 0.3
       this.list = this.$refs.playlist
       this.playerbackground = this.$refs.playerbackground
       this.isShowPlaylist = true

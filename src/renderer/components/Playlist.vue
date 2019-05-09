@@ -2,10 +2,10 @@
   <div>
     <div class="row">
       <div class="col-9">
-        <button @click="showFileDialog()"><font-awesome-icon icon="plus" /></button>
+        <button @click="showFileDialog()"><icon name="playlist_add"></icon></button>
       </div>
       <div class="col-3 text-right">
-        <button @click="hidePlaylist()"><font-awesome-icon icon="times" /></button>
+        <button @click="hidePlaylist()"><icon name="close"></icon></button>
       </div>
     </div>
     <input ref="file" type="file" name="name" style="display: none;" @change="loadMusic()"/>
@@ -14,11 +14,11 @@
         <div class="list-disable text-center" v-show="list.length == 0">
           <h1>Empty Playlist</h1>
           <p>&nbsp;</p>
-          <p>Press <font-awesome-icon icon="plus" /> to add song into playlist.</p>
+          <p>Press <icon name="playlist_add"></icon> to add song into playlist.</p>
         </div>
         <div class="list" v-for="(item, index) in list" v-bind:key="item.url" @click="changeToSelectedMusic(index)">
           <p>
-            <font-awesome-icon v-if="index === currentIndex" icon="volume-up" />&nbsp;
+            <icon name="volume_up" v-if="index === currentIndex"></icon>&nbsp;
             {{ item.title }}
           </p>
         </div> 
@@ -137,6 +137,6 @@
     cursor: initial;
   }
   div.list svg {
-    margin-left: -15px;
+    margin-left: -25px;
   }
 </style>

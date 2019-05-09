@@ -2,15 +2,15 @@ import Vue from 'vue'
 
 import App from './App'
 import MusicInfomation from './plugin/musicInfomation'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import '@savoygu/vue-material-design-icons/src/icons'
+
+/* Register component with one of 2 methods */
+import Icon from '@savoygu/vue-material-design-icons/src/components/Icon'
+
+// globally (in your main .js file)
+Vue.component('icon', Icon)
 
 Vue.config.productionTip = false
-
-/* FontAwesome Icon Initial */
-library.add(fas)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 /* Plugin */
 Vue.use(MusicInfomation)
