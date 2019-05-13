@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Control -->
     <div class="row">
       <div class="col-9">
         <button @click="showFileDialog()"><icon name="playlist_add"></icon></button>
@@ -9,6 +10,7 @@
       </div>
     </div>
     <input ref="file" type="file" name="name" style="display: none;" multiple accept="audio/*" @change="loadMusic()"/>
+    <!-- Playlist -->
     <div class="row">
       <div class="col list-container" style="height: 330px;">
         <div class="list-disable text-center" v-show="list.length == 0">
@@ -16,12 +18,14 @@
           <p>&nbsp;</p>
           <p>Press <icon name="playlist_add"></icon> to add song into playlist.</p>
         </div>
-        <div class="list" v-for="(item, index) in list" v-bind:key="item.url" @click="changeToSelectedMusic(index)">
-          <p>
-            <icon name="volume_up" v-if="index === currentIndex"></icon>&nbsp;
-            {{ item.title }}
-          </p>
-        </div> 
+        <list-item 
+          v-for="(item, index) in list" 
+          :key="item.url" 
+          :item="item" 
+          :index="index"
+          :watchIndex="currentIndex" 
+          @click="changeToSelectedMusic(index)"
+          @destory="removeMusic(index)"></list-item> 
       </div>
     </div>
      
@@ -30,12 +34,16 @@
 
 <script>
   import PlaylistItem from '@/model/PlaylistItem'
+  import ListItem from '@/components/ListItem'
 
   export default {
     name: 'playlist',
+    components: {
+      ListItem
+    },
     data () {
       return {
-        currentIndex: 0,
+        currentIndex: -1,
         _currentPlaying: null,
         list: [],
         file: null
@@ -71,7 +79,9 @@
         this.$getMusicInfomation(url)
           .then(info => {
             let item = new PlaylistItem(url, info.title, info.artist, info.cover)
-            this.list.push(item)
+            if (this.list.find(x => x.url === item.url) === undefined) {
+              this.list.push(item)
+            }
             if (!this._currentPlaying) {
               this.currentPlaying = item
               this.currentIndex = 0
@@ -82,12 +92,9 @@
           })
       },
       removeMusic (index) {
-        if (index === this.currentIndex && index === (this.list.length - 1)) {
-          this.currentIndex = 0
-        }
-        this.list.slice(index, 1)
-        if (this.list.length === 0) {
-          this.currentIndex = -1
+        this.list.splice(index, 1)
+        if (index === this.currentIndex) {
+          this.changeToSelectedMusic(index)
         }
       },
       nextMusic () {
@@ -105,8 +112,13 @@
         this.currentPlaying = this.list[this.currentIndex]
       },
       changeToSelectedMusic (index) {
-        this.currentIndex = index
-        this.currentPlaying = this.list[this.currentIndex]
+        if (index < this.list.length) {
+          this.currentIndex = index
+          this.currentPlaying = this.list[this.currentIndex]
+        } else {
+          this.currentIndex = -1
+          this.currentPlaying = new PlaylistItem('', '', '', null)
+        }
       },
       hidePlaylist () {
         this.$emit('triggerHide')
@@ -124,21 +136,9 @@
     max-height: 400px;
     overflow-y: scroll;
   }
-  div.list,
   div.list-disable {
     color: #fff;
     padding: 10px 30px;
     border-radius: 0.5em;
-  }
-  div.list:hover {
-    background: rgba(0, 0, 0, .1);
-    cursor: pointer;
-  }
-  div.list-disable:hover {
-    background: none;
-    cursor: initial;
-  }
-  div.list svg {
-    margin-left: -25px;
   }
 </style>

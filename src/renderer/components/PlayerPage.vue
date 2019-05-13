@@ -33,7 +33,11 @@
           </div>
         </div>
         <div v-show="isShowPlaylist">
-          <playlist v-on:currentPlayingChange="onPlayingChanged" v-on:triggerHide="hidePlaylist" ref="playlist"></playlist>
+          <playlist 
+            v-on:currentPlayingChange="onPlayingChanged" 
+            v-on:triggerHide="hidePlaylist"
+            v-on:playlistEmpty="stop"
+            ref="playlist"></playlist>
         </div>
         <audio ref="audio" v-bind:src="url" @canplay="playAfterLoaded()" @timeupdate="updateCurrentTime()" @ended="nextMusic()"></audio>
       </div>
@@ -55,6 +59,7 @@
       return {
         isFileSelect: false,
         isPlaying: false,
+        isTriggerStoping: false,
         audio: null,
         url: null,
         list: null,
@@ -78,11 +83,13 @@
         if (this.isPlaying) {
           this.audio.pause()
         } else {
+          this.isTriggerStoping = false
           this.audio.play()
         }
         this.isPlaying = !this.isPlaying
       },
       stop () {
+        this.isTriggerStoping = true
         this.isPlaying = false
         this.audio.pause()
         this.audio.currentTime = 0
@@ -100,12 +107,19 @@
         this.currentMusicTime = this.audio.currentTime
       },
       playAfterLoaded () {
+        if (this.isTriggerStoping) {
+          return
+        }
         this.currentMusicDuration = this.audio.duration
         this.currentMusicTime = this.audio.currentTime
         this.audio.play()
         this.isPlaying = true
       },
       onPlayingChanged (playlistItem) {
+        if (playlistItem.url === '') {
+          this.stop()
+          this.isTriggerStoping = true
+        }
         this.isFileSelect = true
         this.url = playlistItem.url
         this.updateMusicInfomation(playlistItem)
